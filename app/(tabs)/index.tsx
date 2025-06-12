@@ -1,75 +1,120 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TextInputProps,
+  TouchableOpacity,
+  Image,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import "../../global.css"
+import { useRouter } from "expo-router";
+import { LucideIcon, Mail, KeyRound } from "lucide-react-native";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+interface IconTextInputProps extends TextInputProps {
+  Icon: LucideIcon;
 }
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+const IconTextInput: React.FC<IconTextInputProps> = ({
+  Icon,
+  ...textInputProps
+}) => {
+  return (
+    <View className="flex-row items-center border-b border-gray-300 mb-5">
+      <Icon color="gray" size={24} />
+      <TextInput className="flex-1 ml-2 text-lg" {...textInputProps} />
+    </View>
+  );
+};
+
+export default function Login() {
+  const router = useRouter();
+  const [formData, setFormData] = useState({ email: "", password: "" });
+
+  const validateForm = () => {
+    const { email, password } = formData;
+    if (!email || !password) return "Fill all fields";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return "Input a valid email";
+    return null;
+  };
+
+  const handleSubmit = async () => {
+    const error = validateForm();
+    if (error) {
+      Alert.alert("Validation Error", error);
+      return;
+    }
+    router.replace("/main");
+
+    // try {
+    //   const res = await fetch("https://your-backend-url.com/api/login", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify(formData),
+    //   });
+
+    //   if (!res.ok) throw new Error("Invalid user credentials");
+
+    //   const data = await res.json();
+    //   Alert.alert("Success", "Login successful");
+    //   router.replace("/main");
+    // } catch (err: unknown) {
+    //   const message = err instanceof Error ? err.message : "Something went wrong";
+    //   Alert.alert("Login Failed", message);
+    // }
+  };
+
+  return (
+    <KeyboardAvoidingView
+      className="flex-1 bg-white"
+    >
+      <View className="p-10 items-end">
+        {/* <Image
+          source={require("../assets/images/Logo.png")}
+          resizeMode="contain"
+        /> */}
+      </View>
+
+      <View className="flex-1 justify-center bg-white px-6 py-10">
+        <Text className="text-3xl font-bold my-10">Sign In</Text>
+
+        <IconTextInput
+          Icon={Mail}
+          placeholder="Email Address"
+          value={formData.email}
+          onChangeText={(text) => setFormData({ ...formData, email: text })}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+
+        <IconTextInput
+          Icon={KeyRound}
+          placeholder="Password"
+          value={formData.password}
+          onChangeText={(text) => setFormData({ ...formData, password: text })}
+          secureTextEntry
+        />
+
+        <TouchableOpacity
+          onPress={handleSubmit}
+          className="bg-[#5BBAC9] rounded-2xl mx-auto py-3 px-6 items-center mb-6"
+        >
+          <Text className="text-white text-xl font-bold">Sign In</Text>
+        </TouchableOpacity>
+
+        <View className="flex-row justify-center">
+          <Text className="text-gray-500">No Account? </Text>
+          <TouchableOpacity onPress={() => router.push("/signUp")}>
+            <Text className="text-[#5BBAC9] font-semibold underline">
+              Create One
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </KeyboardAvoidingView>
+  );
+}
