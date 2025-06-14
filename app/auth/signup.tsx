@@ -1,17 +1,24 @@
+import { Picker } from "@react-native-picker/picker";
+import { useRouter } from "expo-router";
+import {
+  Calendar,
+  ChevronDown,
+  CircleUser,
+  Home,
+  KeyRound,
+  Mail,
+  Phone,
+} from "lucide-react-native";
 import React, { useState } from "react";
 import {
-  View,
+  Alert,
+  Modal,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  Alert,
-  Modal,
-  Platform,
+  View,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import { useRouter } from "expo-router";
-import { Calendar, CircleUser, Mail, KeyRound, Home, Phone, ChevronDown } from "lucide-react-native";
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -34,7 +41,9 @@ export default function SignUpScreen() {
     year: new Date().getFullYear() - 18, // Default to 18 years ago
   });
 
-  const isFormValid = Object.values(formData).every((v) => v !== "" && v !== null);
+  const isFormValid = Object.values(formData).every(
+    (v) => v !== "" && v !== null
+  );
 
   const updateField = (key: keyof typeof formData, value: any) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -56,11 +65,15 @@ export default function SignUpScreen() {
     }
 
     Alert.alert("Success", "Account created!");
-    router.push("/"); // Navigate after signup success if needed
+    router.push("/"); 
   };
 
   const confirmDateSelection = () => {
-    const selectedDate = new Date(tempDate.year, tempDate.month - 1, tempDate.day);
+    const selectedDate = new Date(
+      tempDate.year,
+      tempDate.month - 1,
+      tempDate.day
+    );
     updateField("birthdate", selectedDate);
     setShowDatePicker(false);
   };
@@ -72,7 +85,7 @@ export default function SignUpScreen() {
   const generateYears = () => {
     const currentYear = new Date().getFullYear();
     const years = [];
-    for (let year = currentYear -100; year <= currentYear - 5; year++) {
+    for (let year = currentYear - 100; year <= currentYear - 5; year++) {
       years.push(year);
     }
     return years.reverse();
@@ -95,7 +108,9 @@ export default function SignUpScreen() {
 
   return (
     <ScrollView className="bg-white p-6">
-      <Text className="text-3xl font-bold mb-6 text-gray-800">Create Account</Text>
+      <Text className="text-3xl font-bold mb-6 text-gray-800">
+        Create Account
+      </Text>
 
       <InputField
         icon={<CircleUser color="#6B7280" size={20} />}
@@ -145,30 +160,30 @@ export default function SignUpScreen() {
             <Picker
               selectedValue={formData.gender}
               onValueChange={(val) => updateField("gender", val)}
-              style={{ 
+              style={{
                 height: 50,
-                color: formData.gender ? '#374151' : '#9CA3AF'
+                color: formData.gender ? "#374151" : "#9CA3AF",
               }}
             >
-              <Picker.Item 
-                label="Select Gender" 
-                value="" 
-                style={{ color: '#9CA3AF' }}
+              <Picker.Item
+                label="Select Gender"
+                value=""
+                style={{ color: "#9CA3AF" }}
               />
-              <Picker.Item 
-                label="Male" 
-                value="Male" 
-                style={{ color: '#374151' }}
+              <Picker.Item
+                label="Male"
+                value="Male"
+                style={{ color: "#374151" }}
               />
-              <Picker.Item 
-                label="Female" 
-                value="Female" 
-                style={{ color: '#374151' }}
+              <Picker.Item
+                label="Female"
+                value="Female"
+                style={{ color: "#374151" }}
               />
-              <Picker.Item 
-                label="Other" 
-                value="Other" 
-                style={{ color: '#374151' }}
+              <Picker.Item
+                label="Other"
+                value="Other"
+                style={{ color: "#374151" }}
               />
             </Picker>
           </View>
@@ -182,14 +197,16 @@ export default function SignUpScreen() {
         className="flex-row items-center border border-gray-300 rounded-xl px-4 py-4 mb-4 bg-gray-50"
       >
         <Calendar color="#6B7280" size={20} />
-        <Text className={`ml-3 text-base flex-1 ${
-          formData.birthdate ? 'text-gray-700' : 'text-gray-400'
-        }`}>
+        <Text
+          className={`ml-3 text-base flex-1 ${
+            formData.birthdate ? "text-gray-700" : "text-gray-400"
+          }`}
+        >
           {formData.birthdate
-            ? formData.birthdate.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
+            ? formData.birthdate.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
               })
             : "Select Date of Birth"}
         </Text>
@@ -208,24 +225,28 @@ export default function SignUpScreen() {
             <Text className="text-xl font-bold text-center mb-6 text-gray-800">
               Select Date of Birth
             </Text>
-            
+
             <View className="flex-row justify-between mb-6">
               {/* Day Picker */}
               <View className="flex-1 mr-2">
-                <Text className="text-sm font-medium text-gray-600 mb-2">Day</Text>
+                <Text className="text-sm font-medium text-gray-600 mb-2">
+                  Day
+                </Text>
                 <View className="border border-gray-300 rounded-lg bg-gray-50">
                   <Picker
                     selectedValue={tempDate.day}
-                    onValueChange={(val) => setTempDate(prev => ({...prev, day: val}))}
+                    onValueChange={(val) =>
+                      setTempDate((prev) => ({ ...prev, day: val }))
+                    }
                     style={{ height: 120 }}
                   >
                     {Array.from(
-                      { length: getDaysInMonth(tempDate.month, tempDate.year) }, 
+                      { length: getDaysInMonth(tempDate.month, tempDate.year) },
                       (_, i) => (
-                        <Picker.Item 
-                          key={i + 1} 
-                          label={String(i + 1)} 
-                          value={i + 1} 
+                        <Picker.Item
+                          key={i + 1}
+                          label={String(i + 1)}
+                          value={i + 1}
                         />
                       )
                     )}
@@ -235,18 +256,22 @@ export default function SignUpScreen() {
 
               {/* Month Picker */}
               <View className="flex-1 mx-1">
-                <Text className="text-sm font-medium text-gray-600 mb-2">Month</Text>
+                <Text className="text-sm font-medium text-gray-600 mb-2">
+                  Month
+                </Text>
                 <View className="border border-gray-300 rounded-lg bg-gray-50">
                   <Picker
                     selectedValue={tempDate.month}
-                    onValueChange={(val) => setTempDate(prev => ({...prev, month: val}))}
+                    onValueChange={(val) =>
+                      setTempDate((prev) => ({ ...prev, month: val }))
+                    }
                     style={{ height: 120 }}
                   >
-                    {months.map(month => (
-                      <Picker.Item 
-                        key={month.value} 
-                        label={month.label} 
-                        value={month.value} 
+                    {months.map((month) => (
+                      <Picker.Item
+                        key={month.value}
+                        label={month.label}
+                        value={month.value}
                       />
                     ))}
                   </Picker>
@@ -255,18 +280,22 @@ export default function SignUpScreen() {
 
               {/* Year Picker */}
               <View className="flex-1 ml-2">
-                <Text className="text-sm font-medium text-gray-600 mb-2">Year</Text>
+                <Text className="text-sm font-medium text-gray-600 mb-2">
+                  Year
+                </Text>
                 <View className="border border-gray-300 rounded-lg bg-gray-50">
                   <Picker
                     selectedValue={tempDate.year}
-                    onValueChange={(val) => setTempDate(prev => ({...prev, year: val}))}
+                    onValueChange={(val) =>
+                      setTempDate((prev) => ({ ...prev, year: val }))
+                    }
                     style={{ height: 120 }}
                   >
-                    {generateYears().map(year => (
-                      <Picker.Item 
-                        key={year} 
-                        label={String(year)} 
-                        value={year} 
+                    {generateYears().map((year) => (
+                      <Picker.Item
+                        key={year}
+                        label={String(year)}
+                        value={year}
                       />
                     ))}
                   </Picker>
@@ -284,7 +313,7 @@ export default function SignUpScreen() {
                   Cancel
                 </Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 onPress={confirmDateSelection}
                 className="flex-1 py-4 rounded-xl bg-[#5BBAC9]"
@@ -305,7 +334,9 @@ export default function SignUpScreen() {
           isFormValid ? "bg-[#5BBAC9]" : "bg-gray-400"
         }`}
       >
-        <Text className="text-white text-center font-bold text-xl">Create Account</Text>
+        <Text className="text-white text-center font-bold text-xl">
+          Create Account
+        </Text>
       </TouchableOpacity>
     </ScrollView>
   );

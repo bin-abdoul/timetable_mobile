@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import AddCoursePage from "./addCourse";
-import ReadTimetablePage from "./readTimetable";
+import ReadTimetablePage from "./app/(tabs)";
+import AddCoursePage from "./app/(tabs)/add-course";
 
 const tabs = [
   { key: "readTimetable", label: "Read Timetable" },
@@ -94,11 +94,11 @@ export default function MainScreen() {
       />
 
       {/* Custom Header */}
-      <View className="bg-white px-6 py-4 border-b border-gray-200">
+      {/* <View className="bg-white px-6 py-4 border-b border-gray-200">
         <Text className="text-2xl font-bold text-gray-800">
           Main Page
         </Text>
-      </View>
+      </View> */}
 
       {/* Tab Bar */}
       <View className="flex-row bg-gray-100 px-4 py-3 border-b border-gray-200">
@@ -123,13 +123,7 @@ export default function MainScreen() {
 
       {/* Content Pages */}
       {selected === "readTimetable" && <ReadTimetablePage />}
-      {selected === "addCourse" && (
-        <AddCoursePage
-          courseData={courseData}
-          setCourseData={setCourseData}
-          handleAddCourse={handleAddCourse}
-        />
-      )}
+      {selected === "addCourse" && <AddCoursePage />}
     </SafeAreaView>
   );
 }
