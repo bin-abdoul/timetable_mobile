@@ -2,7 +2,7 @@ import { api } from "./api";
 
 export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation({
+    login: builder.mutation<unknown, { email: string; password: string }>({
       query: (credentials) => ({
         url: "/auth/login",
         method: "POST",
@@ -21,5 +21,4 @@ export const authApi = api.injectEndpoints({
   }),
 });
 
-// export const {  } = authApi;
-// export const { useLoginMutation, useSignupMutation } = authApi;
+export const { useLoginMutation, useSignupMutation } = authApi;

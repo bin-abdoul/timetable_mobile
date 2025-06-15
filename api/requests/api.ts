@@ -1,11 +1,14 @@
-import { createApi } from "@reduxjs/toolkit/query";
-import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import * as SecureStore from "expo-secure-store";
 
+const backendUrl = "http://localhost:3000"; // Change this to your backend URL if needed
+
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:3000",
+  baseUrl: backendUrl,
   prepareHeaders: async (headers, { getState }) => {
     const token = await SecureStore.getItemAsync("token");
+
+    console.log(backendUrl, "backendUrl");
 
     if (token) {
       headers.set("authorization", `Bearer ${token}`);

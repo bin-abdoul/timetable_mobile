@@ -1,3 +1,4 @@
+import { useLoginMutation } from "@/api/requests/auth.request";
 import { useRouter } from "expo-router";
 import { KeyRound, LucideIcon, Mail } from "lucide-react-native";
 import React, { useState } from "react";
@@ -32,6 +33,8 @@ export default function Login() {
   const router = useRouter();
   const [formData, setFormData] = useState({ email: "", password: "" });
 
+  const [login] = useLoginMutation();
+
   const validateForm = () => {
     const { email, password } = formData;
     if (!email || !password) return "Fill all fields";
@@ -46,24 +49,23 @@ export default function Login() {
       Alert.alert("Validation Error", error);
       return;
     }
-    router.replace("/(tabs)");
+    login({
+      email: formData.email,
+      password: formData.password,
+    })
+      .unwrap()
+      .then((data) => {
+        Alert.alert("Success", "Logged in successfully");
+        router.replace("/(tabs)");
+      })
+      .catch((error) => {
+        console.log("Login error:", error);
+        // Handle error, e.g., show an alert
+        Alert.alert("Login Error", error.data?.message || "An error occurred");
+      });
 
-    // try {
-    //   const res = await fetch("https://backend-url/api/login", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify(formData),
-    //   });
-
-    //   if (!res.ok) throw new Error("Invalid user credentials");
-
-    //   const data = await res.json();
-    //   Alert.alert("Success", "Login successful");
-    //   router.replace("/main");
-    // } catch (err: unknown) {
-    //   const message = err instanceof Error ? err.message : "Something went wrong";
-    //   Alert.alert("Login Failed", message);
-    // }
+    // console.log(response);
+    // router.replace("/(tabs)");
   };
 
   return (
@@ -106,7 +108,7 @@ export default function Login() {
           <Text className="text-gray-500">No Account? </Text>
           <TouchableOpacity
             onPress={() => {
-              router.push("/auth/signup")
+              router.push("/auth/signup");
             }}
           >
             <Text className="text-[#5BBAC9] font-semibold underline">

@@ -1,3 +1,4 @@
+import { api } from "@/api/requests/api";
 import {
   Action,
   combineReducers,
@@ -8,12 +9,13 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import userReducer from "./userSlice";
 const rootReducer = combineReducers({
   user: userReducer,
+  [api.reducerPath]: api.reducer,
 });
 
 const store = configureStore({
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({ serializableCheck: false }),
+    getDefaultMiddleware({ serializableCheck: false }).concat([api.middleware]),
 });
 
 // Type for the root state
