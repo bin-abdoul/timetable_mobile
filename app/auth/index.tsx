@@ -56,6 +56,7 @@ export default function Login() {
       .unwrap()
       .then((data) => {
         Alert.alert("Success", "Logged in successfully");
+        console.log("Login Successful:", data);
         router.replace("/(tabs)");
       })
       .catch((error) => {

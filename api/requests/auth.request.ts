@@ -10,9 +10,21 @@ export const authApi = api.injectEndpoints({
       }),
       // invalidatesTags: ["User"],
     }),
-    signup: builder.mutation({
+    signup: builder.mutation<
+      unknown,
+      {
+        email: string;
+        password: string;
+        firstName: string;
+        lastName: string;
+        phone: string;
+        address: string;
+        gender: string;
+        birthdate: string;
+      }
+    >({
       query: (credentials) => ({
-        url: "/auth/signup",
+        url: "/auth/create-account",
         method: "POST",
         body: credentials,
       }),

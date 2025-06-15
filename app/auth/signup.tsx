@@ -1,5 +1,7 @@
+import { useSignupMutation } from "@/api/requests/auth.request";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
+
 import {
   Calendar,
   ChevronDown,
@@ -22,7 +24,7 @@ import {
 
 export default function SignUpScreen() {
   const router = useRouter();
-
+  const [signup, { isLoading, error }] = useSignupMutation();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -31,7 +33,7 @@ export default function SignUpScreen() {
     address: "",
     phone: "",
     gender: "",
-    birthdate: null as Date | null,
+    birthdate: Date().toString(),
   });
 
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -63,9 +65,30 @@ export default function SignUpScreen() {
       Alert.alert("Error", "Password must be at least 6 characters.");
       return;
     }
+    signup({
+      email: formData.email,
+      password: formData.password,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      address: formData.address,
+      phone: formData.phone,
+      gender: formData.gender,
+      birthdate: formData.birthdate,
+    })
+      .unwrap()
+      .then((data) => {
+        console.log("Signup Successful:", data);
+        Alert.alert("Success", "Account created successfully");
+        router.replace("/(tabs)");
+      })
+      .catch((error) => {
+        console.log("Signup error:", error);
+        // Handle error, e.g., show an alert
+        Alert.alert("Signup Error", error.data?.message || "An error occurred");
+      });
 
     Alert.alert("Success", "Account created!");
-    router.push("/"); 
+    router.push("/(tabs)");
   };
 
   const confirmDateSelection = () => {
@@ -91,6 +114,7 @@ export default function SignUpScreen() {
     return years.reverse();
   };
 
+  console.log("birthdate", formData.birthdate);
   const months = [
     { value: 1, label: "January" },
     { value: 2, label: "February" },
@@ -202,13 +226,7 @@ export default function SignUpScreen() {
             formData.birthdate ? "text-gray-700" : "text-gray-400"
           }`}
         >
-          {formData.birthdate
-            ? formData.birthdate.toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })
-            : "Select Date of Birth"}
+          {formData.birthdate ? formData.birthdate : "Select Date of Birth"}
         </Text>
         <ChevronDown color="#6B7280" size={16} />
       </TouchableOpacity>
