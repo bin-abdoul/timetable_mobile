@@ -1,3 +1,4 @@
+import { useAddSubjectMutation } from "@/api/requests/subjects.request";
 import { Picker } from "@react-native-picker/picker";
 import React, { useState } from "react";
 import {
@@ -10,38 +11,54 @@ import {
 } from "react-native";
 
 type CourseData = {
-  title: string;
-  code: string;
-  lecturer: string;
-  venue: string;
-  creditUnit: string;
-  day: string;
-  time: string;
+  subjectName: string;    
+  courseCode: string;     
+  courseLecturer: string; 
+  subjectVenue: string;   
+  creditUnit: string
+  day: string
+  time: string
+
 };
 
 export default function AddCoursePage() {
   const [courseData, setCourseData] = useState<CourseData>({
-    code: "",
+    courseCode: "",
     creditUnit: "",
     day: "",
-    lecturer: "",
+    courseLecturer: "",
     time: "",
-    title: "",
-    venue: "",
+    subjectName: "",
+    subjectVenue: "",
   });
-  const handleAddCourse = () => {
-    if (!courseData.title || !courseData.code || !courseData.lecturer) {
+  const [addCourse] = useAddSubjectMutation();
+
+  const handleAddCourse = async () => {
+    if (!courseData.subjectName || !courseData.courseCode || !courseData.courseLecturer) {
           Alert.alert("Error", "Please fill in all required fields");
           return;
     }
-    
-    Alert.alert("Success", "Course added successfully!");
+    try {
+          await addCourse({
+            subjectName: courseData.subjectName,
+            courseCode: courseData.courseCode,
+            courseLecturer: courseData.courseLecturer,
+            subjectVenue: courseData.subjectVenue,
+            creditUnit: courseData.creditUnit,
+            day: courseData.day,
+            time: courseData.time,
+          });
+         
+          Alert.alert("Success", "Course added successfully!");
+        } catch (error) {
+          Alert.alert("Error", "Failed to add course");
+        }
 
     setCourseData({
-      title: "",
-      code: "",
-      lecturer: "",
-      venue: "",
+      subjectName: "",
+      courseCode: "",
+      courseLecturer: "",
+      subjectVenue: "",
       creditUnit: "",
       day: "",
       time: "",
@@ -63,7 +80,7 @@ export default function AddCoursePage() {
             <TextInput
               className="bg-[#B8E6E6] p-3 rounded-lg text-gray-700"
               placeholder="Subject title"
-              value={courseData.title}
+              value={courseData.subjectName}
               onChangeText={(text) =>
                 setCourseData((prev) => ({ ...prev, title: text }))
               }
@@ -77,7 +94,7 @@ export default function AddCoursePage() {
             <TextInput
               className="bg-[#B8E6E6] p-3 rounded-lg text-gray-700"
               placeholder="Subject Code"
-              value={courseData.code}
+              value={courseData.courseCode}
               onChangeText={(text) =>
                 setCourseData((prev) => ({ ...prev, code: text }))
               }
@@ -93,7 +110,7 @@ export default function AddCoursePage() {
             <TextInput
               className="bg-[#B8E6E6] p-3 rounded-lg text-gray-700"
               placeholder="Course Lecturer"
-              value={courseData.lecturer}
+              value={courseData.courseLecturer}
               onChangeText={(text) =>
                 setCourseData((prev) => ({ ...prev, lecturer: text }))
               }
@@ -106,12 +123,12 @@ export default function AddCoursePage() {
             </Text>
             <View className="bg-[#B8E6E6] rounded-lg border border-gray-300">
               <Picker
-                selectedValue={courseData.venue}
+                selectedValue={courseData.subjectVenue}
                 onValueChange={(value) =>
                   setCourseData((prev) => ({ ...prev, venue: value }))
                 }
                 style={{
-                  color: courseData.venue ? "#374151" : "#9CA3AF",
+                  color: courseData.subjectVenue ? "#374151" : "#9CA3AF",
                   height: 50,
                 }}
                 itemStyle={{

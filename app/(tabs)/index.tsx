@@ -1,233 +1,199 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  SafeAreaView,
-  Modal,
-  TextInput,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
-// Sample timetable data 
-const timetableData = [
-  {
-    day: "Monday",
-    timeSlot: "8:00AM -- 10:00AM",
-    courseCode: "CSC101",
-    courseTitle: "Intro to Algorithms",
-    lecturer: "Dr. Smith",
-    venue: "Room A",
-    creditUnit: "2",
-    id: "1",
-  },
-  {
-    day: "Monday",
-    timeSlot: "4:00PM -- 6:00PM",
-    courseCode: "GST111",
-    courseTitle: "Intro to English I",
-    lecturer: "Dr. Smith",
-    venue: "Room A",
-    creditUnit: "2",
-    id: "2",
-  },
-  {
-    day: "Wednesday",
-    timeSlot: "10:00AM -- 12:00PM",
-    courseCode: "MTH102",
-    courseTitle: "Linear Algebra",
-    lecturer: "Prof. Jane",
-    venue: "Room B",
-    creditUnit: "1",
-    id: "3",
-  },
-  {
-    day: "Tuesday",
-    timeSlot: "12:00PM -- 1:00PM",
-    courseCode: "PHY104",
-    courseTitle: "Mechanics",
-    lecturer: "Dr. Ray",
-    venue: "Room C",
-    creditUnit: "3",
-    id: "4",
-  },
-  {
-    day: "Friday",
-    timeSlot: "8:00AM -- 10:00AM",
-    courseCode: "PHY104",
-    courseTitle: "Mechanics",
-    lecturer: "Dr. Ray",
-    venue: "Room C",
-    creditUnit: "4",
-    id: "5",
-  },
-  {
-    day: "Thursday",
-    timeSlot: "2:00PM -- 4:00PM",
-    courseCode: "PHY104",
-    courseTitle: "Mechanics",
-    lecturer: "Dr. Ray",
-    venue: "Room C",
-    creditUnit: "4",
-    id: "6",
-  },
-];
+import { useViewTimetableQuery, useUpdateSubjectMutation, useDeleteSubjectMutation } from "@/api/requests/subjects.request";
+import { ChevronDown, ChevronUp, Star } from "lucide-react-native";
+import React, { useState } from "react";
+import {
+  Alert,
+  Modal,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const ReadTimetablePage = () => {
-  const [expandedDays, setExpandedDays] = useState<ExpandedDays>({});
-  const [classes, setClasses] = useState(timetableData);
+  const timetableData = useViewTimetableQuery();
+  const [updateSubject] = useUpdateSubjectMutation();
+  const [deleteSubject] = useDeleteSubjectMutation();
+  
+  const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({});
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [currentClass, setCurrentClass] = useState<ClassData | null>(null);
   const [formData, setFormData] = useState({
-    courseCode: '',
-    courseTitle: '',
-    lecturer: ''
+    courseCode: "",
+    courseTitle: "",
+    lecturer: "",
   });
 
-interface ExpandedDays {
+
+  const classes = Array.isArray(timetableData.data) ? timetableData.data.map(subject => ({
+    day: subject.day,
+    time: subject.time,
+    courseCode: subject.courseCode,
+    courseTitle: subject.subjectName,
+    lecturer: subject.courseLecturer,
+    venue: subject.subjectVenue,
+    creditUnit: subject.creditUnit,
+    id: subject._id,
+  })) : [];
+
+  interface ExpandedDays {
     [day: string]: boolean;
-}
+  }
 
-const toggleDay = (day: string): void => {
+  const toggleDay = (day: string): void => {
     setExpandedDays((prev: ExpandedDays) => ({
-        ...prev,
-        [day]: !prev[day],
+      ...prev,
+      [day]: !prev[day],
     }));
-};
+  };
 
-interface ClassData {
-    day: string;
-    timeSlot: string;
+  interface ClassData {
     courseCode: string;
     courseTitle: string;
     lecturer: string;
+    day: string;
+    time: string;
     venue: string;
     creditUnit: string;
     id: string;
-}
+  }
 
-interface FormData {
+  interface FormData {
     courseCode: string;
     courseTitle: string;
     lecturer: string;
-}
+  }
 
-const openUpdateModal = (classData: ClassData): void => {
+  const openUpdateModal = (classData: ClassData): void => {
     setCurrentClass(classData);
     setFormData({
-        courseCode: classData.courseCode,
-        courseTitle: classData.courseTitle,
-        lecturer: classData.lecturer,
+      courseCode: classData.courseCode,
+      courseTitle: classData.courseTitle,
+      lecturer: classData.lecturer,
     });
     setUpdateModalVisible(true);
-};
+  };
 
   const openDeleteModal = (classData: ClassData): void => {
     setCurrentClass(classData);
     setDeleteModalVisible(true);
   };
 
-  const handleUpdate = () => {
-    // Update the class in the array
-    setClasses(prevClasses =>
-      prevClasses.map(cls =>
-        currentClass && cls.id === currentClass.id
-          ? { ...cls, ...formData }
-          : cls
-      )
-    );
-    setUpdateModalVisible(false);
-    Alert.alert('Success', 'Course updated successfully!');
-  };
-
-  const handleDelete = () => {
-    setClasses(prevClasses =>
-      prevClasses.filter(cls => currentClass && cls.id !== currentClass.id)
-    );
-    setDeleteModalVisible(false);
-    Alert.alert('Success', 'Course deleted successfully!');
-  };
-
-  // Group classes by day
-  const groupedClasses = classes.reduce((acc: Record<string, ClassData[]>, classItem) => {
-    if (!acc[classItem.day]) {
-      acc[classItem.day] = [];
+  const handleUpdate = async () => {
+    if (!currentClass) return;
+    
+    try {
+      await updateSubject({
+        id: currentClass.id,
+        subjectName: formData.courseTitle,
+        courseCode: formData.courseCode,
+        courseLecturer: formData.lecturer,
+      });
+      setUpdateModalVisible(false);
+      Alert.alert("Success", "Course updated successfully!");
+    } catch (error) {
+      Alert.alert("Error", "Failed to update course");
     }
-    acc[classItem.day].push(classItem);
-    return acc;
-  }, {} as Record<string, ClassData[]>);
+  };
+
+  const handleDelete = async () => {
+    if (!currentClass) return;
+    
+    try {
+      await deleteSubject(currentClass.id);
+      setDeleteModalVisible(false);
+      Alert.alert("Success", "Course deleted successfully!");
+    } catch (error) {
+      Alert.alert("Error", "Failed to delete course");
+    }
+  };
+
+  const groupedClasses: Record<string, ClassData[]> = {};
+  classes.forEach(classItem => {
+    if (!groupedClasses[classItem.day]) {
+      groupedClasses[classItem.day] = [];
+    }
+    groupedClasses[classItem.day].push(classItem);
+  });
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
   const ClassCard = ({ classData }: { classData: ClassData }) => (
-    <View className="border-2 border-gray-200 p-2 text-center flex flex-col gap-2 bg-white rounded-lg mb-2">
-      <View className="flex-row justify-center items-center gap-1">
-        <Text className="font-bold text-lg text-blue-600">
-          {classData.courseCode} : {classData.creditUnit}
+    <View className="border border-gray-200 p-3 bg-white rounded-lg mb-2">
+      <View className="flex-row items-center justify-center mb-2">
+        <Text className="font-bold text-blue-600">
+          {classData.courseCode} ({classData.creditUnit} units)
         </Text>
-        <Ionicons name="star" size={20} color="#f97316" />
+        <Star fill="#f97316" size={16} color="#f97316" className="ml-1" />
       </View>
       
-      <Text className="text-sm font-medium text-red-900">{classData.courseTitle}</Text>
-      <Text className="text-green-800 font-medium text-sm">{classData.lecturer}</Text>
-      <Text className="text-sky-500 font-medium text-sm">{classData.venue}</Text>
-      <Text className="text-gray-600 font-medium text-xs">{classData.timeSlot}</Text>
+      <Text className="text-center font-medium text-red-900 mb-1">
+        {classData.courseTitle}
+      </Text>
+      <Text className="text-center text-green-800 text-sm mb-1">
+        {classData.lecturer}
+      </Text>
+      <Text className="text-center text-sky-500 text-sm mb-1">
+        {classData.venue}
+      </Text>
+      <Text className="text-center text-gray-600 text-xs mb-3">
+        {classData.time}
+      </Text>
 
-      <View className="flex-row justify-center gap-2 mt-2">
+      <View className="flex-row justify-center gap-2">
         <TouchableOpacity
-          className="border border-gray-300 px-4 py-2 rounded-md"
+          className="border border-gray-300 px-3 py-1 rounded"
           onPress={() => openUpdateModal(classData)}
         >
-          <Text className="text-sm text-gray-700">Update</Text>
+          <Text className="text-gray-700 text-sm">Edit</Text>
         </TouchableOpacity>
         
         <TouchableOpacity
-          className="bg-red-600 px-4 py-2 rounded-md"
+          className="bg-red-600 px-3 py-1 rounded"
           onPress={() => openDeleteModal(classData)}
         >
-          <Text className="text-sm text-white">Delete</Text>
+          <Text className="text-white text-sm">Delete</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 
-  const DayAccordion = ({ day }: { day: string }) => {
+  const DaySection = ({ day }: { day: string }) => {
     const isExpanded = expandedDays[day];
     const dayClasses = groupedClasses[day] || [];
     const hasClasses = dayClasses.length > 0;
 
     return (
-      <View className="bg-white mb-3 rounded-lg shadow-sm border border-gray-200">
+      <View className="bg-white mb-3 rounded-lg border border-gray-200">
         <TouchableOpacity
-          className="flex-row justify-between items-center p-4 border-b border-gray-200"
+          className="flex-row justify-between items-center p-4"
           onPress={() => toggleDay(day)}
         >
-          <Text className="text-lg font-semibold text-gray-800">{day}</Text>
+          <Text className="text-lg font-semibold">{day}</Text>
           <View className="flex-row items-center gap-2">
             <Text className="text-sm text-gray-600">
-              {hasClasses ? `${dayClasses.length} class${dayClasses.length > 1 ? 'es' : ''}` : 'No classes'}
+              {hasClasses ? `${dayClasses.length} classes` : "No classes"}
             </Text>
-            <Ionicons
-              name={isExpanded ? 'chevron-up' : 'chevron-down'}
-              size={20}
-              color="#666"
-            />
+            {isExpanded ? (
+              <ChevronUp size={20} color="#666" />
+            ) : (
+              <ChevronDown size={20} color="#666" />
+            )}
           </View>
         </TouchableOpacity>
-        
+
         {isExpanded && (
-          <View className="p-4">
+          <View className="p-4 border-t border-gray-200">
             {hasClasses ? (
               dayClasses.map((classData) => (
                 <ClassCard key={classData.id} classData={classData} />
               ))
             ) : (
-              <View className="py-8 items-center">
-                <Text className="text-gray-400 text-sm">No Class</Text>
-              </View>
+              <Text className="text-center text-gray-400 py-4">No classes today</Text>
             )}
           </View>
         )}
@@ -236,103 +202,97 @@ const openUpdateModal = (classData: ClassData): void => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50 my-6">
+    <SafeAreaView className="flex-1 bg-gray-50">
       <View className="bg-white p-4 border-b border-gray-200">
-        <Text className="text-2xl font-bold text-gray-800">Read Timetable</Text>
+        <Text className="text-2xl font-bold text-center">My Timetable</Text>
       </View>
 
       <ScrollView className="flex-1 p-4">
         {days.map((day) => (
-          <DayAccordion key={day} day={day} />
+          <DaySection key={day} day={day} />
         ))}
       </ScrollView>
 
-      {/* Update Modal */}
+      //update modal
       <Modal
-        animationType="slide"
-        transparent={true}
         visible={updateModalVisible}
+        transparent={true}
         onRequestClose={() => setUpdateModalVisible(false)}
       >
         <View className="flex-1 justify-center items-center bg-black/50">
-          <View className="bg-white rounded-lg p-6 w-11/12 max-w-md">
-            <Text className="text-xl font-semibold mb-2">Edit Course</Text>
-            <Text className="text-gray-600 mb-4">Update course information and save changes.</Text>
-            
-            <View className="mb-4">
-              <Text className="text-sm font-medium mb-2">Course Code</Text>
-              <TextInput
-                className="border border-gray-300 rounded-md px-3 py-2"
-                value={formData.courseCode}
-                onChangeText={(text) => setFormData({...formData, courseCode: text})}
-                placeholder="Enter course code"
-              />
-            </View>
-            
-            <View className="mb-4">
-              <Text className="text-sm font-medium mb-2">Course Title</Text>
-              <TextInput
-                className="border border-gray-300 rounded-md px-3 py-2"
-                value={formData.courseTitle}
-                onChangeText={(text) => setFormData({...formData, courseTitle: text})}
-                placeholder="Enter course title"
-              />
-            </View>
-            
-            <View className="mb-6">
-              <Text className="text-sm font-medium mb-2">Lecturer</Text>
-              <TextInput
-                className="border border-gray-300 rounded-md px-3 py-2"
-                value={formData.lecturer}
-                onChangeText={(text) => setFormData({...formData, lecturer: text})}
-                placeholder="Enter lecturer name"
-              />
-            </View>
-            
+          <View className="bg-white rounded-lg p-6 w-11/12">
+            <Text className="text-xl font-bold mb-4">Edit Course</Text>
+
+            <Text className="text-sm font-medium mb-1">Course Code</Text>
+            <TextInput
+              className="border border-gray-300 rounded p-2 mb-3"
+              value={formData.courseCode}
+              onChangeText={(text) =>
+                setFormData({ ...formData, courseCode: text })
+              }
+            />
+
+            <Text className="text-sm font-medium mb-1">Course Title</Text>
+            <TextInput
+              className="border border-gray-300 rounded p-2 mb-3"
+              value={formData.courseTitle}
+              onChangeText={(text) =>
+                setFormData({ ...formData, courseTitle: text })
+              }
+            />
+
+            <Text className="text-sm font-medium mb-1">Lecturer</Text>
+            <TextInput
+              className="border border-gray-300 rounded p-2 mb-4"
+              value={formData.lecturer}
+              onChangeText={(text) =>
+                setFormData({ ...formData, lecturer: text })
+              }
+            />
+
             <View className="flex-row justify-end gap-2">
               <TouchableOpacity
-                className="border border-gray-300 px-4 py-2 rounded-md"
+                className="border border-gray-300 px-4 py-2 rounded"
                 onPress={() => setUpdateModalVisible(false)}
               >
-                <Text className="text-gray-700">Cancel</Text>
+                <Text>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="bg-blue-600 px-4 py-2 rounded-md"
+                className="bg-blue-600 px-4 py-2 rounded"
                 onPress={handleUpdate}
               >
-                <Text className="text-white">Save changes</Text>
+                <Text className="text-white">Save</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
 
-      {/* Delete Modal */}
+      // delete modal
       <Modal
-        animationType="fade"
-        transparent={true}
         visible={deleteModalVisible}
+        transparent={true}
         onRequestClose={() => setDeleteModalVisible(false)}
       >
         <View className="flex-1 justify-center items-center bg-black/50">
-          <View className="bg-white rounded-lg p-6 w-11/12 max-w-sm">
-            <Text className="text-xl font-semibold mb-2">Are you sure?</Text>
-            <Text className="text-gray-600 mb-6">
-              This will permanently remove the course from your timetable.
+          <View className="bg-white rounded-lg p-6 w-11/12">
+            <Text className="text-xl font-bold mb-2">Delete Course?</Text>
+            <Text className="text-gray-600 mb-4">
+              This will remove the course from your timetable.
             </Text>
-            
+
             <View className="flex-row justify-end gap-2">
               <TouchableOpacity
-                className="border border-gray-300 px-4 py-2 rounded-md"
+                className="border border-gray-300 px-4 py-2 rounded"
                 onPress={() => setDeleteModalVisible(false)}
               >
-                <Text className="text-gray-700">Cancel</Text>
+                <Text>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="bg-red-600 px-4 py-2 rounded-md"
+                className="bg-red-600 px-4 py-2 rounded"
                 onPress={handleDelete}
               >
-                <Text className="text-white">Confirm Delete</Text>
+                <Text className="text-white">Delete</Text>
               </TouchableOpacity>
             </View>
           </View>
