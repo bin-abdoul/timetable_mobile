@@ -16,11 +16,12 @@ export const authApi = api.injectEndpoints({
         email: string;
         password: string;
         firstName: string;
-        lastName: string;
-        phone: string;
+        surName: string;
+        phoneNumber: string;
         address: string;
         gender: string;
-        birthdate: string;
+        dob: string;
+        role: string;
       }
     >({
       query: (credentials) => ({

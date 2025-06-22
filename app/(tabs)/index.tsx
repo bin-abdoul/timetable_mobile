@@ -1,5 +1,8 @@
-
-import { useViewTimetableQuery, useUpdateSubjectMutation, useDeleteSubjectMutation } from "@/api/requests/subjects.request";
+import {
+  useDeleteSubjectMutation,
+  useUpdateSubjectMutation,
+  useViewTimetableQuery,
+} from "@/api/requests/subjects.request";
 import { ChevronDown, ChevronUp, Star } from "lucide-react-native";
 import React, { useState } from "react";
 import {
@@ -14,10 +17,10 @@ import {
 } from "react-native";
 
 const ReadTimetablePage = () => {
-  const timetableData = useViewTimetableQuery();
+  const { data: timetableData } = useViewTimetableQuery();
   const [updateSubject] = useUpdateSubjectMutation();
   const [deleteSubject] = useDeleteSubjectMutation();
-  
+
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({});
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -28,17 +31,20 @@ const ReadTimetablePage = () => {
     lecturer: "",
   });
 
+  console.log("Timetable Data:", JSON.stringify(timetableData, null, 2));
 
-  const classes = Array.isArray(timetableData.data) ? timetableData.data.map(subject => ({
-    day: subject.day,
-    time: subject.time,
-    courseCode: subject.courseCode,
-    courseTitle: subject.subjectName,
-    lecturer: subject.courseLecturer,
-    venue: subject.subjectVenue,
-    creditUnit: subject.creditUnit,
-    id: subject._id,
-  })) : [];
+  // const classes = Array.isArray(timetableData.data)
+  //   ? timetableData.data.map((subject) => ({
+  //       day: subject.day,
+  //       time: subject.time,
+  //       courseCode: subject.courseCode,
+  //       courseTitle: subject.subjectName,
+  //       lecturer: subject.courseLecturer,
+  //       venue: subject.subjectVenue,
+  //       creditUnit: subject.creditUnit,
+  //       id: subject._id,
+  //     }))
+  //   : [];
 
   interface ExpandedDays {
     [day: string]: boolean;
@@ -85,7 +91,7 @@ const ReadTimetablePage = () => {
 
   const handleUpdate = async () => {
     if (!currentClass) return;
-    
+
     try {
       await updateSubject({
         id: currentClass.id,
@@ -102,7 +108,7 @@ const ReadTimetablePage = () => {
 
   const handleDelete = async () => {
     if (!currentClass) return;
-    
+
     try {
       await deleteSubject(currentClass.id);
       setDeleteModalVisible(false);
@@ -113,12 +119,12 @@ const ReadTimetablePage = () => {
   };
 
   const groupedClasses: Record<string, ClassData[]> = {};
-  classes.forEach(classItem => {
-    if (!groupedClasses[classItem.day]) {
-      groupedClasses[classItem.day] = [];
-    }
-    groupedClasses[classItem.day].push(classItem);
-  });
+  // classes.forEach((classItem) => {
+  //   if (!groupedClasses[classItem.day]) {
+  //     groupedClasses[classItem.day] = [];
+  //   }
+  //   groupedClasses[classItem.day].push(classItem);
+  // });
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
@@ -130,7 +136,7 @@ const ReadTimetablePage = () => {
         </Text>
         <Star fill="#f97316" size={16} color="#f97316" className="ml-1" />
       </View>
-      
+
       <Text className="text-center font-medium text-red-900 mb-1">
         {classData.courseTitle}
       </Text>
@@ -151,7 +157,7 @@ const ReadTimetablePage = () => {
         >
           <Text className="text-gray-700 text-sm">Edit</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           className="bg-red-600 px-3 py-1 rounded"
           onPress={() => openDeleteModal(classData)}
@@ -193,7 +199,9 @@ const ReadTimetablePage = () => {
                 <ClassCard key={classData.id} classData={classData} />
               ))
             ) : (
-              <Text className="text-center text-gray-400 py-4">No classes today</Text>
+              <Text className="text-center text-gray-400 py-4">
+                No classes today
+              </Text>
             )}
           </View>
         )}
@@ -213,7 +221,7 @@ const ReadTimetablePage = () => {
         ))}
       </ScrollView>
 
-      //update modal
+      {/* //update modal */}
       <Modal
         visible={updateModalVisible}
         transparent={true}
@@ -268,7 +276,7 @@ const ReadTimetablePage = () => {
         </View>
       </Modal>
 
-      // delete modal
+      {/* // delete modal */}
       <Modal
         visible={deleteModalVisible}
         transparent={true}

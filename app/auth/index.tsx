@@ -1,5 +1,6 @@
 import { useLoginMutation } from "@/api/requests/auth.request";
 import { useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { KeyRound, LucideIcon, Mail } from "lucide-react-native";
 import React, { useState } from "react";
 import {
@@ -57,16 +58,17 @@ export default function Login() {
       .then((data) => {
         Alert.alert("Success", "Logged in successfully");
         console.log("Login Successful:", data);
+
+        SecureStore.setItemAsync("token", data.data.accessToken);
+
         router.replace("/(tabs)");
       })
       .catch((error) => {
-        console.log("Login error:", error);
+        console.log("Login error:", JSON.stringify(error, null, 2));
         // Handle error, e.g., show an alert
-        Alert.alert("Login Error", error.data?.message || "An error occurred");
+        Alert.alert("Login Error", error.data?.error || "An error occurred");
       });
-
-    // console.log(response);
-    // router.replace("/(tabs)");
+    
   };
 
   return (

@@ -8,8 +8,6 @@ const baseQuery = fetchBaseQuery({
   prepareHeaders: async (headers, { getState }) => {
     const token = await SecureStore.getItemAsync("token");
 
-    console.log(backendUrl, "backendUrl");
-
     if (token) {
       headers.set("authorization", `Bearer ${token}`);
     }
@@ -20,6 +18,7 @@ const baseQuery = fetchBaseQuery({
 export const api = createApi({
   reducerPath: "api",
   baseQuery,
+  tagTypes: ["User", "Subject"],
   endpoints: (builder) => ({
     index: builder.query({
       query: () => ({

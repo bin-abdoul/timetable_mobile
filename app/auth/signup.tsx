@@ -1,6 +1,7 @@
 import { useSignupMutation } from "@/api/requests/auth.request";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 
 import {
   Calendar,
@@ -69,26 +70,25 @@ export default function SignUpScreen() {
       email: formData.email,
       password: formData.password,
       firstName: formData.firstName,
-      lastName: formData.lastName,
+      surName: formData.lastName,
       address: formData.address,
-      phone: formData.phone,
+      phoneNumber: formData.phone,
       gender: formData.gender,
-      birthdate: formData.birthdate,
+      dob: formData.birthdate,
+      role: "User",
     })
       .unwrap()
       .then((data) => {
-        console.log("Signup Successful:", data);
+        console.log("Signup Successful:", JSON.stringify(data));
         Alert.alert("Success", "Account created successfully");
+        SecureStore.setItemAsync("token", data.data.token);
         router.replace("/(tabs)");
       })
       .catch((error) => {
-        console.log("Signup error:", error);
+        console.log("Signup error:", JSON.stringify(error, null, 2));
         // Handle error, e.g., show an alert
-        Alert.alert("Signup Error", error.data?.message || "An error occurred");
+        Alert.alert("Signup Error", error.data.message || "An error occurred");
       });
-
-    Alert.alert("Success", "Account created!");
-    router.push("/(tabs)");
   };
 
   const confirmDateSelection = () => {
@@ -196,17 +196,17 @@ export default function SignUpScreen() {
               />
               <Picker.Item
                 label="Male"
-                value="Male"
+                value="male"
                 style={{ color: "#374151" }}
               />
               <Picker.Item
                 label="Female"
-                value="Female"
+                value="female"
                 style={{ color: "#374151" }}
               />
               <Picker.Item
                 label="Other"
-                value="Other"
+                value="other"
                 style={{ color: "#374151" }}
               />
             </Picker>

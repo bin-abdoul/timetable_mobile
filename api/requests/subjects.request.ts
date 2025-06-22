@@ -15,35 +15,37 @@ export const subjectApi = api.injectEndpoints({
       }
     >({
       query: (credentials) => ({
-        url: "/(tabs)/add-subject",
+        url: "/subject/add-subject",
         method: "POST",
         body: credentials,
       }),
-    //   invalidatesTags: [""],
+      invalidatesTags: ["Subject"],
     }),
 
-    
     viewTimetable: builder.query<unknown, void>({
       query: () => ({
-        url: "/(tabs)/subject-list",
+        url: "/subject/subject-list",
         method: "GET",
       }),
-    //   invalidatesTags: [""],
+      //   invalidatesTags: [""],
+      providesTags: ["Subject"],
     }),
 
-    updateSubject: builder.mutation<unknown, 
-    {
-      id: string;
+    updateSubject: builder.mutation<
+      unknown,
+      {
+        id: string;
         subjectName: string;
         courseCode: string;
         courseLecturer: string;
-    }>({
+      }
+    >({
       query: (credentials) => ({
-        url: "/(tabs)/subject-list",
+        url: "/subject/edit-subject",
         method: "PUT",
         body: credentials,
       }),
-    //   invalidatesTags: [""],
+      invalidatesTags: ["Subject"],
     }),
 
     deleteSubject: builder.mutation<unknown, string>({
@@ -51,14 +53,14 @@ export const subjectApi = api.injectEndpoints({
         url: "/(tabs)/subject-list",
         method: "DELETE",
       }),
-    //   invalidatesTags: [""],
+      invalidatesTags: ["Subject"],
     }),
   }),
 });
 
 export const {
-    useAddSubjectMutation,
-    useViewTimetableQuery,
-    useUpdateSubjectMutation,
-    useDeleteSubjectMutation,
-  } = subjectApi;
+  useAddSubjectMutation,
+  useViewTimetableQuery,
+  useUpdateSubjectMutation,
+  useDeleteSubjectMutation,
+} = subjectApi;

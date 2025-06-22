@@ -2,23 +2,22 @@ import { useAddSubjectMutation } from "@/api/requests/subjects.request";
 import { Picker } from "@react-native-picker/picker";
 import React, { useState } from "react";
 import {
+  Alert,
   SafeAreaView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Alert,
 } from "react-native";
 
 type CourseData = {
-  subjectName: string;    
-  courseCode: string;     
-  courseLecturer: string; 
-  subjectVenue: string;   
-  creditUnit: string
-  day: string
-  time: string
-
+  subjectName: string;
+  courseCode: string;
+  courseLecturer: string;
+  subjectVenue: string;
+  creditUnit: string;
+  day: string;
+  time: string;
 };
 
 export default function AddCoursePage() {
@@ -34,25 +33,30 @@ export default function AddCoursePage() {
   const [addCourse] = useAddSubjectMutation();
 
   const handleAddCourse = async () => {
-    if (!courseData.subjectName || !courseData.courseCode || !courseData.courseLecturer) {
-          Alert.alert("Error", "Please fill in all required fields");
-          return;
+    if (
+      !courseData.subjectName ||
+      !courseData.courseCode ||
+      !courseData.courseLecturer
+    ) {
+      Alert.alert("Error", "Please fill in all required fields");
+      return;
     }
     try {
-          await addCourse({
-            subjectName: courseData.subjectName,
-            courseCode: courseData.courseCode,
-            courseLecturer: courseData.courseLecturer,
-            subjectVenue: courseData.subjectVenue,
-            creditUnit: courseData.creditUnit,
-            day: courseData.day,
-            time: courseData.time,
-          });
-         
-          Alert.alert("Success", "Course added successfully!");
-        } catch (error) {
-          Alert.alert("Error", "Failed to add course");
-        }
+      await addCourse({
+        subjectName: courseData.subjectName,
+        courseCode: courseData.courseCode,
+        courseLecturer: courseData.courseLecturer,
+        subjectVenue: courseData.subjectVenue,
+        creditUnit: courseData.creditUnit,
+        day: courseData.day,
+        time: courseData.time,
+      }).unwrap();
+
+      Alert.alert("Success", "Course added successfully!");
+    } catch (error) {
+      Alert.alert("Error", `Failed to add course ${error.data.message}`);
+      console.error("Error adding course:", JSON.stringify(error, null, 2));
+    }
 
     setCourseData({
       subjectName: "",
@@ -63,7 +67,6 @@ export default function AddCoursePage() {
       day: "",
       time: "",
     });
-    
   };
   return (
     <SafeAreaView className="flex-1 my-10 bg-white">
@@ -82,7 +85,7 @@ export default function AddCoursePage() {
               placeholder="Subject title"
               value={courseData.subjectName}
               onChangeText={(text) =>
-                setCourseData((prev) => ({ ...prev, title: text }))
+                setCourseData((prev) => ({ ...prev, subjectName: text }))
               }
             />
           </View>
@@ -96,7 +99,7 @@ export default function AddCoursePage() {
               placeholder="Subject Code"
               value={courseData.courseCode}
               onChangeText={(text) =>
-                setCourseData((prev) => ({ ...prev, code: text }))
+                setCourseData((prev) => ({ ...prev, courseCode: text }))
               }
             />
           </View>
@@ -112,7 +115,7 @@ export default function AddCoursePage() {
               placeholder="Course Lecturer"
               value={courseData.courseLecturer}
               onChangeText={(text) =>
-                setCourseData((prev) => ({ ...prev, lecturer: text }))
+                setCourseData((prev) => ({ ...prev, courseLecturer: text }))
               }
             />
           </View>
@@ -125,7 +128,7 @@ export default function AddCoursePage() {
               <Picker
                 selectedValue={courseData.subjectVenue}
                 onValueChange={(value) =>
-                  setCourseData((prev) => ({ ...prev, venue: value }))
+                  setCourseData((prev) => ({ ...prev, subjectVenue: value }))
                 }
                 style={{
                   color: courseData.subjectVenue ? "#374151" : "#9CA3AF",
@@ -176,10 +179,10 @@ export default function AddCoursePage() {
                   value=""
                   style={{ color: "#9CA3AF" }}
                 />
-                <Picker.Item label="1" value="1" />
-                <Picker.Item label="2" value="2" />
-                <Picker.Item label="3" value="3" />
-                <Picker.Item label="4" value="4" />
+                <Picker.Item label="1" value="one" />
+                <Picker.Item label="2" value="two" />
+                <Picker.Item label="3" value="three" />
+                <Picker.Item label="4" value="four" />
               </Picker>
             </View>
           </View>
@@ -241,26 +244,11 @@ export default function AddCoursePage() {
                   value=""
                   style={{ color: "#9CA3AF" }}
                 />
-                <Picker.Item
-                  label="8:00 AM -- 10:00 AM"
-                  value="8:00 AM -- 10:00 AM"
-                />
-                <Picker.Item
-                  label="10:00 AM -- 12:00 PM"
-                  value="10:00 AM -- 12:00 PM"
-                />
-                <Picker.Item
-                  label="12:00 PM -- 1:00 PM"
-                  value="12:00 PM -- 1:00 PM"
-                />
-                <Picker.Item
-                  label="2:00 PM -- 4:00 PM"
-                  value="2:00 PM -- 4:00 PM"
-                />
-                <Picker.Item
-                  label="4:00 PM -- 6:00 PM"
-                  value="4:00 PM -- 6:00 PM"
-                />
+                <Picker.Item label="8:00 -- 10:00" value="8:00 -- 10:00" />
+                <Picker.Item label="10:00 -- 12:00" value="10:00 -- 12:00" />
+                <Picker.Item label="12:00 -- 1:00" value="12:00 -- 2:00" />
+                <Picker.Item label="2:00 -- 4:00" value="2:00 -- 4:00" />
+                <Picker.Item label="4:00 -- 6:00" value="4:00 -- 6:00" />
               </Picker>
             </View>
           </View>
