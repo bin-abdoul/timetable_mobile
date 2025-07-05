@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import * as SecureStore from "expo-secure-store";
 
-const backendUrl = "http://localhost:3000"; // Change this to your backend URL if needed
+const backendUrl = "http://localhost:3000";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: backendUrl,

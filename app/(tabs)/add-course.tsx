@@ -36,7 +36,11 @@ export default function AddCoursePage() {
     if (
       !courseData.subjectName ||
       !courseData.courseCode ||
-      !courseData.courseLecturer
+      !courseData.courseLecturer ||
+      !courseData.time ||
+      !courseData.day ||
+      !courseData.subjectVenue ||
+      !courseData.creditUnit
     ) {
       Alert.alert("Error", "Please fill in all required fields");
       return;
@@ -53,7 +57,7 @@ export default function AddCoursePage() {
       }).unwrap();
 
       Alert.alert("Success", "Course added successfully!");
-    } catch (error) {
+    } catch (error:any) {
       Alert.alert("Error", `Failed to add course ${error.data.message}`);
       console.error("Error adding course:", JSON.stringify(error, null, 2));
     }
@@ -246,7 +250,7 @@ export default function AddCoursePage() {
                 />
                 <Picker.Item label="8:00 -- 10:00" value="8:00 -- 10:00" />
                 <Picker.Item label="10:00 -- 12:00" value="10:00 -- 12:00" />
-                <Picker.Item label="12:00 -- 1:00" value="12:00 -- 2:00" />
+                <Picker.Item label="12:00 -- 1:00" value="12:00 -- 1:00" />
                 <Picker.Item label="2:00 -- 4:00" value="2:00 -- 4:00" />
                 <Picker.Item label="4:00 -- 6:00" value="4:00 -- 6:00" />
               </Picker>

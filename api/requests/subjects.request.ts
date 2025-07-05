@@ -27,7 +27,7 @@ export const subjectApi = api.injectEndpoints({
         url: "/subject/subject-list",
         method: "GET",
       }),
-      //   invalidatesTags: [""],
+      transformResponse: (response: any) => response.data,
       providesTags: ["Subject"],
     }),
 
@@ -49,9 +49,10 @@ export const subjectApi = api.injectEndpoints({
     }),
 
     deleteSubject: builder.mutation<unknown, string>({
-      query: () => ({
-        url: "/(tabs)/subject-list",
+      query: (id) => ({
+        url: "/subject/delete-subject",
         method: "DELETE",
+        body: {id}
       }),
       invalidatesTags: ["Subject"],
     }),

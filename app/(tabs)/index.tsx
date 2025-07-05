@@ -17,7 +17,16 @@ import {
 } from "react-native";
 
 const ReadTimetablePage = () => {
-  const { data: timetableData } = useViewTimetableQuery();
+  const { data: timetableData } = useViewTimetableQuery() as { data: Array<{
+    day: string;
+    time: string;
+    courseCode: string;
+    subjectName: string;
+    courseLecturer: string;
+    subjectVenue: string;
+    creditUnit: string;
+    _id: string;
+  }> };
   const [updateSubject] = useUpdateSubjectMutation();
   const [deleteSubject] = useDeleteSubjectMutation();
 
@@ -33,18 +42,18 @@ const ReadTimetablePage = () => {
 
   console.log("Timetable Data:", JSON.stringify(timetableData, null, 2));
 
-  // const classes = Array.isArray(timetableData.data)
-  //   ? timetableData.data.map((subject) => ({
-  //       day: subject.day,
-  //       time: subject.time,
-  //       courseCode: subject.courseCode,
-  //       courseTitle: subject.subjectName,
-  //       lecturer: subject.courseLecturer,
-  //       venue: subject.subjectVenue,
-  //       creditUnit: subject.creditUnit,
-  //       id: subject._id,
-  //     }))
-  //   : [];
+  const classes = Array.isArray(timetableData)
+    ? timetableData.map((subject) => ({
+        day: subject.day,
+        time: subject.time,
+        courseCode: subject.courseCode,
+        courseTitle: subject.subjectName,
+        lecturer: subject.courseLecturer,
+        venue: subject.subjectVenue,
+        creditUnit: subject.creditUnit,
+        id: subject._id,
+      }))
+    : [];
 
   interface ExpandedDays {
     [day: string]: boolean;
@@ -119,12 +128,12 @@ const ReadTimetablePage = () => {
   };
 
   const groupedClasses: Record<string, ClassData[]> = {};
-  // classes.forEach((classItem) => {
-  //   if (!groupedClasses[classItem.day]) {
-  //     groupedClasses[classItem.day] = [];
-  //   }
-  //   groupedClasses[classItem.day].push(classItem);
-  // });
+  classes.forEach((classItem) => {
+    if (!groupedClasses[classItem.day]) {
+      groupedClasses[classItem.day] = [];
+    }
+    groupedClasses[classItem.day].push(classItem);
+  });
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 

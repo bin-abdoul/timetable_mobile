@@ -34,14 +34,14 @@ export default function SignUpScreen() {
     address: "",
     phone: "",
     gender: "",
-    birthdate: Date().toString(),
+    birthdate: new Date().toString(),
   });
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [tempDate, setTempDate] = useState({
     day: 1,
     month: 1,
-    year: new Date().getFullYear() - 18, // Default to 18 years ago
+    year: new Date().getFullYear() - 18, 
   });
 
   const isFormValid = Object.values(formData).every(
@@ -86,7 +86,6 @@ export default function SignUpScreen() {
       })
       .catch((error) => {
         console.log("Signup error:", JSON.stringify(error, null, 2));
-        // Handle error, e.g., show an alert
         Alert.alert("Signup Error", error.data.message || "An error occurred");
       });
   };
@@ -176,7 +175,7 @@ export default function SignUpScreen() {
         keyboardType="phone-pad"
       />
 
-      {/* Gender Picker - Styled */}
+      {/* Gender Picker */}
       <View className="mb-4">
         <View className="flex-row items-center border border-gray-300 rounded-xl px-4 py-2 bg-gray-50">
           <CircleUser color="#6B7280" size={20} />
@@ -226,7 +225,7 @@ export default function SignUpScreen() {
             formData.birthdate ? "text-gray-700" : "text-gray-400"
           }`}
         >
-          {formData.birthdate ? formData.birthdate : "Select Date of Birth"}
+          {formData.birthdate ? new Date(formData.birthdate).toLocaleDateString() : "Select Date of Birth"}
         </Text>
         <ChevronDown color="#6B7280" size={16} />
       </TouchableOpacity>
