@@ -31,6 +31,7 @@ const ReadTimetablePage = () => {
   };
   const [updateSubject] = useUpdateSubjectMutation();
   const [deleteSubject] = useDeleteSubjectMutation();
+  // console.log()
 
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({});
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
