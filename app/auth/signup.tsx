@@ -28,20 +28,20 @@ export default function SignUpScreen() {
   const [signup, { isLoading, error }] = useSignupMutation();
   const [formData, setFormData] = useState({
     firstName: "",
-    lastName: "",
+    surName: "",
     email: "",
     password: "",
     address: "",
-    phone: "",
+    phoneNumber: "",
     gender: "",
-    birthdate: new Date().toString(),
+    dob: new Date().toLocaleDateString(),
   });
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [tempDate, setTempDate] = useState({
     day: 1,
     month: 1,
-    year: new Date().getFullYear() - 18, 
+    year: new Date().getFullYear() - 18,
   });
 
   const isFormValid = Object.values(formData).every(
@@ -70,15 +70,15 @@ export default function SignUpScreen() {
       email: formData.email,
       password: formData.password,
       firstName: formData.firstName,
-      surName: formData.lastName,
+      surName: formData.surName,
       address: formData.address,
-      phoneNumber: formData.phone,
+      phoneNumber: formData.phoneNumber,
       gender: formData.gender,
-      dob: formData.birthdate,
+      dob: formData.dob,
       role: "User",
     })
       .unwrap()
-      .then((data) => {
+      .then((data: any) => {
         console.log("Signup Successful:", JSON.stringify(data));
         Alert.alert("Success", "Account created successfully");
         SecureStore.setItemAsync("token", data.data.token);
@@ -96,7 +96,7 @@ export default function SignUpScreen() {
       tempDate.month - 1,
       tempDate.day
     );
-    updateField("birthdate", selectedDate);
+    updateField("dob", selectedDate);
     setShowDatePicker(false);
   };
 
@@ -113,7 +113,6 @@ export default function SignUpScreen() {
     return years.reverse();
   };
 
-  console.log("birthdate", formData.birthdate);
   const months = [
     { value: 1, label: "January" },
     { value: 2, label: "February" },
@@ -144,8 +143,8 @@ export default function SignUpScreen() {
       <InputField
         icon={<CircleUser color="#6B7280" size={20} />}
         placeholder="Last Name"
-        value={formData.lastName}
-        onChange={(val) => updateField("lastName", val)}
+        value={formData.surName}
+        onChange={(val) => updateField("surName", val)}
       />
       <InputField
         icon={<Mail color="#6B7280" size={20} />}
@@ -170,8 +169,8 @@ export default function SignUpScreen() {
       <InputField
         icon={<Phone color="#6B7280" size={20} />}
         placeholder="Phone Number"
-        value={formData.phone}
-        onChange={(val) => updateField("phone", val)}
+        value={formData.phoneNumber}
+        onChange={(val) => updateField("phoneNumber", val)}
         keyboardType="phone-pad"
       />
 
@@ -222,10 +221,12 @@ export default function SignUpScreen() {
         <Calendar color="#6B7280" size={20} />
         <Text
           className={`ml-3 text-base flex-1 ${
-            formData.birthdate ? "text-gray-700" : "text-gray-400"
+            formData.dob ? "text-gray-700" : "text-gray-400"
           }`}
         >
-          {formData.birthdate ? new Date(formData.birthdate).toLocaleDateString() : "Select Date of Birth"}
+          {formData.dob
+            ? new Date(formData.dob).toLocaleDateString()
+            : "Select Date of Birth"}
         </Text>
         <ChevronDown color="#6B7280" size={16} />
       </TouchableOpacity>

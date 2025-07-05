@@ -17,16 +17,18 @@ import {
 } from "react-native";
 
 const ReadTimetablePage = () => {
-  const { data: timetableData } = useViewTimetableQuery() as { data: Array<{
-    day: string;
-    time: string;
-    courseCode: string;
-    subjectName: string;
-    courseLecturer: string;
-    subjectVenue: string;
-    creditUnit: string;
-    _id: string;
-  }> };
+  const { data: timetableData } = useViewTimetableQuery() as {
+    data: {
+      day: string;
+      time: string;
+      courseCode: string;
+      subjectName: string;
+      courseLecturer: string;
+      subjectVenue: string;
+      creditUnit: string;
+      _id: string;
+    }[];
+  };
   const [updateSubject] = useUpdateSubjectMutation();
   const [deleteSubject] = useDeleteSubjectMutation();
 

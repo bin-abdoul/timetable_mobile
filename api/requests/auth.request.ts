@@ -1,17 +1,5 @@
 import { api } from "./api";
 
-interface User {
-  _id: string;
-  firstName: string;
-  surName: string;
-  email: string;
-  phoneNumber: string;
-  role: 'Admin' | 'User' | 'Moderator';
-  gender: string;
-  address: string;
-  dob: string;
-}
-
 export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<unknown, { email: string; password: string }>({
@@ -43,7 +31,7 @@ export const authApi = api.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
-  })
+  }),
 });
 
-export const { useLoginMutation, useSignupMutation} = authApi;
+export const { useLoginMutation, useSignupMutation } = authApi;
